@@ -1,13 +1,13 @@
 +++
 title = "good to great"
-draft = true
-date = "2017-04-07T12:37:07+02:00"
+draft = false
+date = "2017-04-08T11:09:35+02:00"
 disable_profile = true
 disable_widgets = false
 tags = ["test"]
 +++
 
-I read **Good to Great in January 2016**. An awesome read sharing detailed analysis on how good companies became great.
+Hugo test
 
 # heading 1
 

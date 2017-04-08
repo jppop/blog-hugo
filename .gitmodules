@@ -1,0 +1,4 @@
+[submodule "public"]
+	path = public
+	url = https://github.com/jppop/jppop.github.io.git
+	branch = master
