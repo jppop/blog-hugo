@@ -2,9 +2,9 @@
 banner = "/images/spring-modularity.png"
 menu = ""
 description = "Spring config et modularité"
-date = "2017-04-08T11:34:16+02:00"
+date = "2017-04-10T00:56:56+02:00"
 title = "Spring config et modularité"
-draft = true
+draft = false
 disable_profile = true
 categories = ["développement"]
 tags = ["spring", "java"]

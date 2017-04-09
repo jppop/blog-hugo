@@ -1,8 +1,8 @@
 +++
 title = "good to great"
-draft = true
+draft = false
 banner = "/images/lechat-megalo.gif"
-date = "2017-04-08T11:09:35+02:00"
+date = "2017-04-10T00:56:44+02:00"
 disable_profile = true
 disable_widgets = false
 categories = ["idées"]
