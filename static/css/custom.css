@@ -10,10 +10,6 @@ body {
   background-color: #fafafa;
 }
 
-.hljs {
-  background-color: #f5f5f5;
-  color: #444;
-}
 h1, h2, h3, h4, h5 ,h6 {
   font-family: 'Open Sans';
   font-weight: 300;
@@ -51,4 +47,58 @@ h1, h2, h3, h4, h5 ,h6 {
   -webkit-background-size: 100% 100%;
   -moz-background-size: 100% 100%;
   background-size: 100% 100%;
+}
+
+.article-entry {
+  color: #000;
+}
+.article-entry a {
+  color: #2196F3;
+}
+.article-entry blockquote {
+  background-color: inherit;
+  margin: 0 -5px;
+}
+
+div.note {
+  position: relative;
+  font-size: 1.1em;
+  border-left: 4px solid #eee;
+  margin: 0 -10px;
+  padding: 10px 10px 10px 10px;
+}
+div.note-tldr {
+  position: relative;
+  border-left: 4px solid #eee;
+  margin: 0 -10px;
+  padding: 10px 10px 10px 10px;
+}
+div.note-tldr:before {
+  content: "TL;DR";
+  font-weight: bold;
+}
+
+.hljs code {
+  background-color: #f5f5f5;
+  color: #444;
+  padding: inherit;
+}
+code {
+  margin: 0;
+  -webkit-border-radius: 0;
+  line-height: normal;
+}
+.hljs-code,
+.hljs-class .hljs-title,
+.hljs-header {
+  color: #2e87e7;
+}
+.highlight {
+  margin: 0px;
+  display: block;
+  overflow-x: auto;
+  padding: 0;
+  font-size: 14px;
+  font-family: "Source Code Pro", Consolas, Monaco, Menlo, Consolas, monospace;
+//  line-height: 22.400000000000002px;
 }
