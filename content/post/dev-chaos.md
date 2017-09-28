@@ -22,13 +22,13 @@ Le développement en parallèle n’est pas une nouveauté. Des solutions éprou
 ## Problème
 
 Le front consomme des ressources produites par le back. Dans la phase de développement, les ressources évoluent très vite (jusqu’à plusieurs fois par jour) alors que les consommateurs ont besoin de stabilité.
-L’objectif est donc de proposer au front des ressources stables tout en permettant aux développeurs du back de les faire évoluer rapidement. En d’autres termes, il faut que chaque ressource exposée dispose de deux cycles de vie : celui des développeurs et celui des consommateurs.
+L’objectif est donc de proposer au front des ressources stables tout en permettant aux développeurs du back de les faire évoluer rapidement. En d’autres termes, il faut que chaque ressource exposée dispose de deux cycles de vie : celui des producteurs et celui des consommateurs.
 
 ## Des solutions
 
 Une solution simple pour proposer deux cycles de vie est de disposer de deux environnements de développement : un pour le front et un pour le back. La plateforme de fabrication distingue déjà deux environnements : les branches A et B. Il me semble difficile d’en introduire facilement d’autres. Par contre, il existe déjà un environnement justement prévu pour intégrer un consommateur et un producteur : la plateforme d’intégration, la VMOE.
 
-La première piste consiste donc à utiliser la VMOE pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté développeur du back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, voir plus loin, la livraison). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la VMOE ?
+La première piste consiste donc à utiliser la VMOE pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, voir plus loin, la livraison). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la VMOE ?
 
 Une deuxième piste, permettant à tous de rester dans l’environnement DEV-TU, consiste à mettre à disposition des consommateurs une autre ressource, stable dans le temps : un bouchon. Là encore, il faut résoudre le problème « comment consommer ce bouchon ».
 
@@ -36,8 +36,21 @@ Avant de voir comment résoudre pratiquement l’utilisation d’une ressource d
 
 ### Consommation des services SOA
 
-Une UA consomme un service en utilisant un clieant SOAP : les classes Java générées par un plugin Eclipse. Le _endpoint_ du service est configuré dans le fichier de contexte Spring (applicationContext.xml) :
+Une UA consomme un service en utilisant un clieant SOAP : les classes Java générées par un plugin Eclipse. Le _endpoint_ du service est configuré dans le fichier de contexte Spring (`applicationContext.xml`) :
 
 ```xml
 <todo/>
 ```
+
+Un proxy est ensuite utilisé pour obtenir le client (le framework ajoute certaines informations liées à la sécurité) :
+
+```java
+WSConf wsConf = getBean("uaMyUa.srvtMyService");
+MyService service = getProxy(wsConf);
+```
+
+Jusqu'ici tout va bien : l'URL du endpoint est externalisée et le client du service est injecté. On peut donc espérer résoudre notre problème à la fois en spécifiant une URL particulière ou bien en injectant un autre bean qui simulera l'appel au service réel.
+
+### Consommation de services REST
+
+_todo_
