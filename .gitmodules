@@ -2,3 +2,6 @@
 	path = public
 	url = https://github.com/jppop/jppop.github.io.git
 	branch = master
+[submodule "themes/ananke"]
+	path = themes/ananke
+	url = https://github.com/budparr/gohugo-theme-ananke.git
