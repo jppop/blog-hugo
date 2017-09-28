@@ -49,8 +49,8 @@ Une UA consomme un service en utilisant un clieant SOAP : les classes Java gén�
 
 	<context:property-placeholder location="classpath:ua_rechercherdossiersinistre_version.properties" />
 
-	<bean id="ua_rechercherdossiersinistre.srvt_rechercherdossiersinistre" class="fr.ca.cat.ihm.ws.WsConf">
-		<property name="serviceInterface" value="fr.ca.cat.ihm.rechercherdossiersinistre.client.srvtrechercherdossiersinistre.generated.SRVTRechercherDossierSinistre" />
+	<bean id="ua_rechercherdossiersinistre.srvt_rechercherdossiersinistre" class="x.y.z.ihm.ws.WsConf">
+		<property name="serviceInterface" value="x.y.z.ihm.rechercherdossiersinistre.client.srvtrechercherdossiersinistre.generated.SRVTRechercherDossierSinistre" />
 		<property name="wsdlDocumentUrl" value="WEB-INF/wsdl/ua_rechercherdossiersinistre/SRVT_RechercherDossierSinistre/wsdl/SRVT_RechercherDossierSinistre.wsdl" />
 		<property name="namespaceUri" value="http://ca.cat.fr/df/Assurances/RechercherDossierSinistre/2/SRVT_RechercherDossierSinistre/" />
 		<property name="serviceName" value="SRVT_RechercherDossierSinistrePort" />
@@ -73,7 +73,7 @@ Jusqu'ici tout va bien : l'URL du endpoint est externalisée et le client du ser
 
 ### Consommation de services REST
 
-_todo_
+_todo (assez similaire à la consommation de services SOA)_
 
 ## Consommation de services VMOE en DEV-TU
 
@@ -140,3 +140,76 @@ mvn pic:specialisation -P specialisation,local -Dintegration-back
 
 Pour le build sur la plateforme DEV-TU effectué par la PIC, il faudra définir la propriété dans la définition de la génération demandée :
 ![Lancement de la génération](/images/builder-define-prop.png)
+
+## Simulation des services
+L'autre mmoyen de garantir la stabilité du service est de simuler les appels. Nous allons donc remplacer le service réel par un fake.
+
+Le client du service est instancié comme suit :
+```java
+WsConf wsConf = (WsConf) getBean("ua_rechercherdossiersinistre.srvt_rechercherdossiersinistre");
+SRVTRechercherDossierSinistre srvtRechercherSini = getWsProxy(wsConf);
+```
+Le bean wsConf est un POJO définissant les informations du services (le endpoint, la classe d'interface). Il sera également utilisé par le service fake.
+L'obtention du proxy est plus problématique : la méthode est _protected_ et finale. C'est normal. Les concepteurs adressent un message clair aux développeurs : ne surchargez pas cette méthode, en cas de modification, cela risque de ne plus marcher. Soit. On devrait stopper ici mais, un changment impose de faire évoluer le framework ET que le projet intègre cette modification (changement de la version de la dépendance). Donc si la méthode `getWsProxy` évolue, le projet ne sera impacté que s'il le décide. Bref, nous allons contourner getWsProxy.
+
+Le code cette méthode est le suivant :
+```java
+protected final <T> T getWsProxy(WsConf wsConf)
+	throws TechnicalException
+{
+	return (T)WsProxyFactory.getWsProxy(wsConf, getContext(), getUaID(), getUaVersion());
+}
+```
+La méthode getWsProxy de la classe WsProxyFactory est publique. Les arguments qui lui sont passés sont, en plus de la configuration du WS, des informations liées au _controler_ implémenté par l'UA.
+Nous pouvons la ré-écrire :
+```java
+package x.y.z.ihm.rechercherdossiersinistre.utils;
+
+import x.y.z.ihm.catalog.tools.Version;
+import x.y.z.ihm.controller.bean.Context;
+import x.y.z.ihm.exception.TechnicalException;
+import x.y.z.ihm.ws.WsConf;
+import x.y.z.ihm.ws.WsProxyFactory;
+
+public class WsProxyManager {
+
+	@SuppressWarnings("unchecked")
+	public <T> T getWsProxy(WsConf wsConf, Context context, String uaId, Version uaVersion) throws TechnicalException {
+		return (T) WsProxyFactory.getWsProxy(wsConf, context, uaId,
+				uaVersion);
+	}
+}
+```
+et changer l'appel :
+```java
+WsProxyManager proxyMgr = (WsProxyManager) getBean("WsProxyManager");
+SRVTRechercherDossierSinistre srvtRechercherSini =
+		proxyMgr.getWsProxy(wsConf, getContext(), getUaID(), getUaVersion());
+```
+Le bean WsProxyManager est déclaré dans le contexte :
+```xml
+<bean id="WsProxyManager" class="....WsProxyManager" />
+```
+Nous avons maintenant la base pourvoir fournir un fake service en changeant l'implémentation de WsProxyManager :
+```java
+
+public class FakeWsProxyManager {
+
+	@SuppressWarnings("unchecked")
+	public <T> T getWsProxy(WsConf wsConf, Context context, String uaId, Version uaVersion) throws TechnicalException {
+
+		if (wsConf.getServiceInterface().isAssignableFrom(SRVTRechercherDossierSinistre.class)) {
+			return (T) new SRVTRechercherDossierSinistreFake();
+		}
+		return (T) WsProxyFactory.getWsProxy(wsConf, context, uaId,
+				uaVersion);
+	}
+
+}
+```
+FakeWsProxyManager permet de fournir la classe de simulation pour le client SRVTRechercherDossierSinistre. Cette classe implémente l'interface du service et créera des données de la façon la plus appropriée (codées en dur, générées aléatoirement, lues depuis un fichier de configuration, dans une base embarquée, etc.)
+
+Reste à essayer de régler un problème : nos bonnes pratiques voudraient que le build "cible" (pour la VMOE et au delà) produise les binaires et la configuration prévus pour cette cible. On ne doit pas risquer de déployer en VMOE une UA qui utiliserait un fake.
+
+On pourrait s'appuyer les profils Spring (introduits en 3.1). Mais ces derniers sont activables à l'exécution. Je ne sais pas s'il est possible de faire ajouter une option dans les serveurs WAS en DEV-TU.
+Le build doit donc résoudre ce problème.
