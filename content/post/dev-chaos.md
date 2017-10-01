@@ -1,5 +1,5 @@
 +++
-draft = true
+draft = false
 images = []
 banner = ""
 menu = ""
@@ -29,7 +29,7 @@ L’objectif est donc de proposer au front des ressources stables tout en permet
 
 Une solution simple pour proposer deux cycles de vie est de disposer de deux environnements de développement : un pour le front et un pour le back. La plateforme de fabrication distingue déjà deux environnements : les branches A et B. Il me semble difficile d’en introduire facilement d’autres. Par contre, il existe déjà un environnement justement prévu pour intégrer un consommateur et un producteur : la plateforme d’intégration, la VMOE.
 
-La première piste consiste donc à utiliser la VMOE pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, voir plus loin, la livraison). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la VMOE ?
+La première piste consiste donc à utiliser la VMOE pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, abordé dans un post ultérieur). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la VMOE ?
 
 Une deuxième piste, permettant à tous de rester dans l’environnement DEV-TU, consiste à mettre à disposition des consommateurs une autre ressource, stable dans le temps : un bouchon. Là encore, il faut résoudre le problème « comment consommer ce bouchon ».
 
@@ -79,14 +79,14 @@ _todo (assez similaire à la consommation de services SOA)_
 
 <div class="note">
 <strong>Avertissement :</strong>
-Il n'est pas certain que cette méthode fonctionne (je ne l'ai pas testé jusqu'au bout). Il ne serait pas étonnant que des barrières de sécurité existent et empêchent à un client de DEV-TU d'accéder à une ressource de VMOE. Si tel était le cas, un accès direct au serveur WAS (sans passer par le médiateur) pourrait focntionner. Sinon, le bouchon restera la seule solution possible.
+Il n'est pas certain que cette méthode fonctionne (je ne l'ai pas testé jusqu'au bout). Il ne serait pas étonnant que des barrières de sécurité existent et empêchent à un client de DEV-TU d'accéder à une ressource de VMOE. Si tel était le cas, un accès direct au serveur WAS (sans passer par le médiateur) pourrait fonctionner. Sinon, le bouchon restera la seule solution possible.
 </div>
 
 Pour rappel, nous allons faire en sorte que le client pointe sur le serveur de VMOE. Trivialement, on pourrait bien sur coder en dur l'URL dans le fichier de properties. Mais cela conviendrait à une règle importante : les sources ne sont pas modifiés en fonction de la cible de déploiement.
 
 Maven et ses profils sont là pour ça.
 
-L'URL du endpoint est externalisée dans le fichier `ua_rechercherdossiersinistre_version.properties` chargé Spring :
+L'URL du endpoint est externalisée dans le fichier `ua_rechercherdossiersinistre_version.properties` chargé par Spring :
 ```
 ua_rechercherdossiersinistre.service.srvtrechercherdossiersinistre.adresse=${WSO2_MEDCHost}/${WSO2_adabo}/SRVT_RechercherDossierSinistre_vs_2
 ```
@@ -109,7 +109,10 @@ Le `pom.xml` contient la valeur du endpoint :
 	...
 </project>
 ```
-Du point de vue de l'assemblage du projet, nous n'avons rien changé. Mais nous avons introduit une variable qui va permettre d'adpater l'URL à un contexte : déboguage du service en local, utilisation du service déployé en intégration (VMOE).
+<div class="note" style="font-style: italic;">
+<strong>Note : </strong>Pas de magie dans l'instanciation des variables. Les builder PIC s'appuie sur le plugin Maven Resource pour instancier les variables. L'examen des pom parent des projets UA, SRVT le montre clairement.
+</div>
+Du point de vue de l'assemblage du projet, nous n'avons rien changé. Mais nous avons introduit une variable qui va permettre d'adpater l'URL à un contexte : déboguage du service en local ou utilisation du service déployé en intégration (VMOE).
 Pour modifier l'URL au build, il suffit de fournir l'URL au moment de la spécialisation :
 ```shell
 mvn pic:specialisation -P specialisation,local -DSRVT_RechercherDossierSinistre.endpoint="http://locahost:9080/SRVT_RechercherDossierSinistre"
@@ -118,10 +121,11 @@ On peut préférer ajouter un profil dans le pom :
 ```xml
 <profiles>
 	<profile>
-		<id>integration</id>
+		<id>pre-integration</id>
 		<activation>
 			<property>
-				<name>integration-back</name>
+				<name>env</name>
+				<value>pre-integration</value>
 			</property>
 		</activation>
 		<properties>
@@ -131,18 +135,18 @@ On peut préférer ajouter un profil dans le pom :
 </profiles>
 ```
 
-Le host de l'URL du service est définie avec le médiateur de l'environnement VMOE (le site phisio donne les serveurs de chaque environnement).
+Le host de l'URL du service est défini avec le médiateur de l'environnement VMOE (le site phisio donne les serveurs de chaque environnement).
 
-Le profil est activé en définissant la propriété `integration-back` :
+Le profil est activé en définissant la propriété `env` à la valeur pre-integration` :
 ```
-mvn pic:specialisation -P specialisation,local -Dintegration-back
+mvn pic:specialisation -P specialisation,local -Denv=pre-integration
 ```
 
 Pour le build sur la plateforme DEV-TU effectué par la PIC, il faudra définir la propriété dans la définition de la génération demandée :
 ![Lancement de la génération](/images/builder-define-prop.png)
 
 ## Simulation des services
-L'autre mmoyen de garantir la stabilité du service est de simuler les appels. Nous allons donc remplacer le service réel par un fake.
+L'autre moyen de garantir la stabilité du service est de simuler les appels. Nous allons donc remplacer le service réel par un _fake_.
 
 Le client du service est instancié comme suit :
 ```java
@@ -150,7 +154,7 @@ WsConf wsConf = (WsConf) getBean("ua_rechercherdossiersinistre.srvt_rechercherdo
 SRVTRechercherDossierSinistre srvtRechercherSini = getWsProxy(wsConf);
 ```
 Le bean wsConf est un POJO définissant les informations du services (le endpoint, la classe d'interface). Il sera également utilisé par le service fake.
-L'obtention du proxy est plus problématique : la méthode est _protected_ et finale. C'est normal. Les concepteurs adressent un message clair aux développeurs : ne surchargez pas cette méthode, en cas de modification, cela risque de ne plus marcher. Soit. On devrait stopper ici mais, un changment impose de faire évoluer le framework ET que le projet intègre cette modification (changement de la version de la dépendance). Donc si la méthode `getWsProxy` évolue, le projet ne sera impacté que s'il le décide. Bref, nous allons contourner getWsProxy.
+L'obtention du proxy est plus problématique : la méthode est _protected_ et finale. C'est normal. Les concepteurs adressent un message clair aux développeurs : ne surchargez pas cette méthode, en cas de modification, cela risque de ne plus marcher. Soit. On devrait stopper ici mais, un changement impose de faire évoluer le framework ET que le projet intègre cette modification (changement de la version de la dépendance). Donc si la méthode `getWsProxy` évolue, le projet ne sera impacté que s'il le décide. Bref, nous allons contourner l'interdiction.
 
 Le code cette méthode est le suivant :
 ```java
@@ -188,9 +192,9 @@ SRVTRechercherDossierSinistre srvtRechercherSini =
 ```
 Le bean WsProxyManager est déclaré dans le contexte :
 ```xml
-<bean id="WsProxyManager" class="....WsProxyManager" />
+<bean id="WsProxyManager" class="x.y.z.WsProxyManager" />
 ```
-Nous avons maintenant la base pourvoir fournir un fake service en changeant l'implémentation de WsProxyManager :
+Nous avons maintenant la base pour pourvoir fournir un fake service en changeant l'implémentation de WsProxyManager :
 ```java
 
 public class FakeWsProxyManager {
@@ -212,4 +216,45 @@ FakeWsProxyManager permet de fournir la classe de simulation pour le client SRVT
 Reste à essayer de régler un problème : nos bonnes pratiques voudraient que le build "cible" (pour la VMOE et au delà) produise les binaires et la configuration prévus pour cette cible. On ne doit pas risquer de déployer en VMOE une UA qui utiliserait un fake.
 
 On pourrait s'appuyer les profils Spring (introduits en 3.1). Mais ces derniers sont activables à l'exécution. Je ne sais pas s'il est possible de faire ajouter une option dans les serveurs WAS en DEV-TU.
-Le build doit donc résoudre ce problème.
+Le build doit donc résoudre ce problème. Les profils maven vont encore une fois nous aider.
+
+Ce que nous devons faire c'est changer l'implémentation du bean WsProxyManger en fonction du profile choisi.
+Commençons par ajouter dans le pom une propriété référençant la classe d'implémentation :
+```xml
+	...
+	<properties>
+		...
+		<SRVT_RechercherDossierSinistre.WsProxyManager>x.y.z.WsProxyManager</SRVT_RechercherDossierSinistre.WsProxyManager>			
+	</properties>
+	...
+</project>
+```
+Cette variable référence la classe immplémentant le proxy cible.
+On ajoute ensuite un profil qui va permettre de remplacer cette implémentation par un fake :
+```xml
+<profiles>
+	<profile>
+		<id>pre-integration</id>
+		<activation>
+			<property>
+				<name>env</name>
+				<value>pre-integration</value>
+			</property>
+		</activation>
+		<properties>
+			...
+			<SRVT_RechercherDossierSinistre.WsProxyManager>x.y.z.FakeWsProxyManager</SRVT_RechercherDossierSinistre.WsProxyManager>			
+		</properties>
+	</profile>
+</profiles>
+```
+Le profil est activé en définissant la propriété `env` à la valeur pre-integration` :
+```
+mvn pic:specialisation -P specialisation,local -Denv=pre-integration
+```
+Voili voila !
+
+# Conclusion
+Nous avons deux solutions pour que les développeurs du front vivent leur vie sans gêner ceux du back. Ils peuvent consommer les services déployés en VMOE ou bien utiliser les fakes.
+La première solution présente l'avantage de n'avoir rien à développer alors qu'il faut développer du code pour simuler les données dans la deuxième solution. Ceci-dit, développer un bouchon devrait être la première chose faite, indépendamment du partage de responsabilité. Cela peut paraitre fastidieux mais cela fait gagner du temps par la suite.
+Reste une question : qui est responsable du bouchon : le front ou le back ? Idéalement, les deux. C'est le back qui doit proposer un bouchon mais le front doit pouvoir l'adapter à ses _use cases_. La responsabilité doit être partagée. En plus cela permet aux deux équipes de se parler et de mieux se comprendre.

@@ -67,6 +67,27 @@ div.note {
   margin: 0 -10px;
   padding: 10px 10px 10px 10px;
 }
+div.note:before {
+  content:">>";
+  font-weight: bold;
+}
+/**
+div.note:before {
+  background-image: url('images/warn.png');
+  background-size: 32px 32px;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  content:"";
+}
+div.note:before {
+  content: url('images/warn.png');
+  display: block;
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+}
+**/
 div.note-tldr {
   position: relative;
   border-left: 4px solid #eee;
