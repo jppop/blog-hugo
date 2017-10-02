@@ -17,8 +17,8 @@ tags = ["dev", "java", "spring"]
 <strong>Avertissement : post à usage interne. Cet article s'inscrit dans un contexte particulier, privé.</strong>
 </div>
 
-La fabrication du SI Nice pose de nombreux problèmes aux développeurs dès que, et c’est toujours le cas, plusieurs équipes sont impliquées. Par exemple, une équipe pour développer le front, une pour le back. Et on ajoute une troisième, les utilisateurs qui testent le tout. Comment éviter que ces trois-là ne se fassent pas la guerre ?
-Le développement en parallèle n’est pas une nouveauté. Des solutions éprouvées existent. Comment les adapter à la fabrication du SI Nice ? Comment, pratiquement, éviter de se gêner les uns les autres pendant le build et le run ?
+La fabrication du SI pose de nombreux problèmes aux développeurs dès que, et c’est toujours le cas, plusieurs équipes sont impliquées. Par exemple, une équipe pour développer le front, une pour le back. Et on ajoute une troisième, les utilisateurs qui testent le tout. Comment éviter que ces trois-là ne se fassent pas la guerre ?
+Le développement en parallèle n’est pas une nouveauté. Des solutions éprouvées existent. Comment les adapter à la fabrication du SI ? Comment, pratiquement, éviter de se gêner les uns les autres pendant le build et le run ?
 
 <!--more-->
 ## Problème
@@ -28,13 +28,13 @@ L’objectif est donc de proposer au front des ressources stables tout en permet
 
 ## Des solutions
 
-Une solution simple pour proposer deux cycles de vie est de disposer de deux environnements de développement : un pour le front et un pour le back. La plateforme de fabrication distingue déjà deux environnements : les branches A et B. Il me semble difficile d’en introduire facilement d’autres. Par contre, il existe déjà un environnement justement prévu pour intégrer un consommateur et un producteur : la plateforme d’intégration, la VMOE.
+Une solution simple pour proposer deux cycles de vie est de disposer de deux environnements de développement : un pour le front et un pour le back. La plateforme de fabrication distingue déjà deux environnements : les branches A et B. Il me semble difficile d’en introduire facilement d’autres. Par contre, il existe déjà un environnement justement prévu pour intégrer un consommateur et un producteur : la plateforme d’intégration.
 
-La première piste consiste donc à utiliser la VMOE pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, abordé dans un post ultérieur). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la VMOE ?
+La première piste consiste donc à utiliser la platefome d'intégration pour pousser les ressources en garantissant aux consommateurs une certaine stabilité. Le problème est résolu coté back (il est quand même nécessaire d’adopter les bonnes pratiques de gestions des sources, abordé dans un post ultérieur). Mais il est transféré coté front : comment, en DEV-TU, consommer des ressources de la platefome d'intégration ?
 
 Une deuxième piste, permettant à tous de rester dans l’environnement DEV-TU, consiste à mettre à disposition des consommateurs une autre ressource, stable dans le temps : un bouchon. Là encore, il faut résoudre le problème « comment consommer ce bouchon ».
 
-Avant de voir comment résoudre pratiquement l’utilisation d’une ressource différente (bouchon ou VMOE), il est important d’examiner comment les ressources sont consommées par le front (on se limitera au PUC pour l’instant).
+Avant de voir comment résoudre pratiquement l’utilisation d’une ressource différente (bouchon ou services déployés en intégration), il est important d’examiner comment les ressources sont consommées par le front (on se limitera au PUC pour l’instant).
 
 ### Consommation des services SOA
 
@@ -76,14 +76,14 @@ Jusqu'ici tout va bien : l'URL du endpoint est externalisée et le client du ser
 
 _todo (assez similaire à la consommation de services SOA)_
 
-## Consommation de services VMOE en DEV-TU
+## Consommation de services intégration en DEV-TU
 
 <div class="note">
 <strong>Avertissement :</strong>
-Il n'est pas certain que cette méthode fonctionne (je ne l'ai pas testé jusqu'au bout). Il ne serait pas étonnant que des barrières de sécurité existent et empêchent à un client de DEV-TU d'accéder à une ressource de VMOE. Si tel était le cas, un accès direct au serveur WAS (sans passer par le médiateur) pourrait fonctionner. Sinon, le bouchon restera la seule solution possible.
+Il n'est pas certain que cette méthode fonctionne (je ne l'ai pas testé jusqu'au bout). Il ne serait pas étonnant que des barrières de sécurité existent et empêchent à un client de DEV-TU d'accéder à une ressource d'intégration. Si tel était le cas, un accès direct au serveur WAS (sans passer par le médiateur) pourrait fonctionner. Sinon, le bouchon restera la seule solution possible.
 </div>
 
-Pour rappel, nous allons faire en sorte que le client pointe sur le serveur de VMOE. Trivialement, on pourrait bien sur coder en dur l'URL dans le fichier de properties. Mais cela conviendrait à une règle importante : les sources ne sont pas modifiés en fonction de la cible de déploiement.
+Pour rappel, nous allons faire en sorte que le client pointe sur le serveur d'intégration. Trivialement, on pourrait bien sur coder en dur l'URL dans le fichier de properties. Mais cela conviendrait à une règle importante : les sources ne sont pas modifiés en fonction de la cible de déploiement.
 
 Maven et ses profils sont là pour ça.
 
@@ -113,7 +113,7 @@ Le `pom.xml` contient la valeur du endpoint :
 <div class="note" style="font-style: italic;">
 <strong>Note : </strong>Pas de magie dans l'instanciation des variables. Les builder PIC s'appuie sur le plugin Maven Resource pour instancier les variables. L'examen des pom parent des projets UA, SRVT le montre clairement.
 </div>
-Du point de vue de l'assemblage du projet, nous n'avons rien changé. Mais nous avons introduit une variable qui va permettre d'adpater l'URL à un contexte : déboguage du service en local ou utilisation du service déployé en intégration (VMOE).
+Du point de vue de l'assemblage du projet, nous n'avons rien changé. Mais nous avons introduit une variable qui va permettre d'adpater l'URL à un contexte : déboguage du service en local ou utilisation du service déployé en intégration.
 Pour modifier l'URL au build, il suffit de fournir l'URL au moment de la spécialisation :
 ```shell
 mvn pic:specialisation -P specialisation,local -DSRVT_RechercherDossierSinistre.endpoint="http://locahost:9080/SRVT_RechercherDossierSinistre"
@@ -136,7 +136,7 @@ On peut préférer ajouter un profil dans le pom :
 </profiles>
 ```
 
-Le host de l'URL du service est défini avec le médiateur de l'environnement VMOE (le site phisio donne les serveurs de chaque environnement).
+Le host de l'URL du service est défini avec le médiateur de l'environnement d'intégration (le site phisio donne les serveurs de chaque environnement).
 
 Le profil est activé en définissant la propriété `env` à la valeur pre-integration` :
 ```
@@ -214,7 +214,7 @@ public class FakeWsProxyManager {
 ```
 FakeWsProxyManager permet de fournir la classe de simulation pour le client SRVTRechercherDossierSinistre. Cette classe implémente l'interface du service et créera des données de la façon la plus appropriée (codées en dur, générées aléatoirement, lues depuis un fichier de configuration, dans une base embarquée, etc.)
 
-Reste à essayer de régler un problème : nos bonnes pratiques voudraient que le build "cible" (pour la VMOE et au delà) produise les binaires et la configuration prévus pour cette cible. On ne doit pas risquer de déployer en VMOE une UA qui utiliserait un fake.
+Reste à essayer de régler un problème : nos bonnes pratiques voudraient que le build "cible" (pour l'intégration et au delà) produise les binaires et la configuration prévus pour cette cible. On ne doit pas risquer de déployer en intégration une UA qui utiliserait un fake.
 
 On pourrait s'appuyer les profils Spring (introduits en 3.1). Mais ces derniers sont activables à l'exécution. Je ne sais pas s'il est possible de faire ajouter une option dans les serveurs WAS en DEV-TU.
 Le build doit donc résoudre ce problème. Les profils maven vont encore une fois nous aider.
@@ -256,6 +256,6 @@ mvn pic:specialisation -P specialisation,local -Denv=pre-integration
 Voili voila !
 
 # Conclusion
-Nous avons deux solutions pour que les développeurs du front vivent leur vie sans gêner ceux du back. Ils peuvent consommer les services déployés en VMOE ou bien utiliser les fakes.
+Nous avons deux solutions pour que les développeurs du front vivent leur vie sans gêner ceux du back. Ils peuvent consommer les services déployés en intégration ou bien utiliser les fakes.
 La première solution présente l'avantage de n'avoir rien à développer alors qu'il faut développer du code pour simuler les données dans la deuxième solution. Ceci-dit, développer un bouchon devrait être la première chose faite, indépendamment du partage de responsabilité. Cela peut paraitre fastidieux mais cela fait gagner du temps par la suite.
 Reste une question : qui est responsable du bouchon : le front ou le back ? Idéalement, les deux. C'est le back qui doit proposer un bouchon mais le front doit pouvoir l'adapter à ses _use cases_. La responsabilité doit être partagée. En plus cela permet aux deux équipes de se parler et de mieux se comprendre.
