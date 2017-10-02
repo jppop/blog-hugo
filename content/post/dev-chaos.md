@@ -7,6 +7,7 @@ description = ""
 date = "2017-09-27T17:18:55+02:00"
 title = "Cauchemar en DEV-TU"
 disable_profile = true
+disable_widgets = false
 categories = ["internal"]
 tags = ["dev", "java", "spring"]
 +++

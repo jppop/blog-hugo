@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5 ,h6 {
 }
 
 @media screen and (min-width: 1200px) {
-  #main-article {
+  #main {
     display: inline;
     float: left;
     width: 70%;
@@ -32,10 +32,42 @@ h1, h2, h3, h4, h5 ,h6 {
   }
 }
 @media screen and (min-width: 800px) and (max-width: 1199px) {
-  #main-article {
+  #main {
     display: inline;
     float: left;
-    width: 67.6923076923077%;
+    width: 70%;
+    margin: 0 0.769230769230769%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #main-article {
+    display: inline;
+//    float: left;
+    width: 80%;
+    margin: 0 0.769230769230769%;
+  }
+}
+@media screen and (min-width: 800px) and (max-width: 1199px) {
+  #main-article {
+    display: inline;
+//    float: left;
+    width: 80%;
+    margin: 0 0.769230769230769%;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #sidebar {
+    display: inline;
+    float: right;
+    width: 20%;
+    margin: 0 0.769230769230769%;
+  }
+}
+@media screen and (min-width: 800px) and (max-width: 1199px) {
+  #sidebar {
+    display: inline;
+    float: right;
+    width: 80%;
     margin: 0 0.769230769230769%;
   }
 }
