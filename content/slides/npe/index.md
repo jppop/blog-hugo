@@ -36,7 +36,7 @@ class: center, middle
    Ca fait 3, mais celle la n’a rien à voir, c’est juste pour dire, qu’en fait, il n’y a qu’une règle : .focus-high[anticiper].
 
 .focus[
-Anticiper les erreurs que les Autres vont commettre.
+Anticiper les erreurs que les autres vont commettre.
 Tip : on est tous l'autre de quelqu'un.
 ]
 
@@ -91,6 +91,14 @@ public void order(Pizza pizza, Topping[] toppings, Drink drink) {
  …
 }
 ```
+
+.see-also[
+Quand un développeur ("l'Autre") utilisera l'auto-complétion de son IDE favoris, il saura que plusieurs
+options existent. Il choisira la signature de méthode qu'il lui convient.
+
+Peu de chance qu'il commande une pizza et une boisson nulle alors qu'il a un méthode de commander
+une pizza seule.
+]
 
 ---
 
@@ -247,3 +255,24 @@ public class Person {
 ```
 
 .focus[Attention! Choisir une valeur par défaut n'est pas anodin. Cela doit être validé par le métier]
+
+---
+
+# Empathie
+
+Les erreurs `NullPointerException` arrivent toujours parce qu'on n'a pas prévu que cela pouvait
+arriver.
+
+Et parfois, parce que le développeur utilise une méthode qu'il croit, de bonne foi, ne pas pouvoir
+retourner une référence nulle.  
+Parfois à cause de son nom (`getCount`).  
+D'autres fois, parce la méthode est mal documentée ou d'utilisation compliquée (mal conçue)...
+
+Le mieux pour éviter les `NullPointerException` est d'anticiper en se mettant à la place du développeur
+qui utilisera votre code.
+
+L'écriture de tests unitaires est la bonne place pour cet exercie d'empathie.
+Vous êtes alors le premier utilisateur de votre code. Si l'écriture du test est difficile,
+peut-être faut-il le revoir.
+
+.focus-high[Bonne anticipation.]

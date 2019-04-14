@@ -236,7 +236,7 @@ Une solution : utiliser des constantes :
 ```
 
 --
-Mais on duplique aussi l'association division/étage dans 2 méthodes.
+Mais on duplique toujours l'association division/étage dans 2 méthodes.
 
 Toujours un risque d'erreur.
 
@@ -307,11 +307,29 @@ template: dry
 
 ---
 
+template: dry
+
+### Qu'est-ce qu'on a fait ?
+
+.see-also[
+L'association division/étage est codée à un seul endroit : le tableau `divisions`.
+
+Les méthodes `divisionFromFloor` et `floorFromDivision` sont devenues des "algorithmes"
+exploitant le tableau pour fournir l'information demandée. Elles ne détiennent plus
+de responsabilité.
+
+Ajouter un étage, une division se fera à un seul endroit.
+Le risque de coder une erreur d'association division/étage
+est fortement réduit (le développeur a une vue d'ensemble de l'immeuble).
+]
+
+---
+
 template: none
 
 # Abstraction
 
-Jeff Bolos le lance dans la vente en ligne de livres. Il automatise l'emballage.
+Jeff Bolos se lance dans la vente en ligne de livres. Il automatise l'emballage.
 
 ```java
 public class Book {
@@ -382,7 +400,6 @@ public class PackageService {
     }
     return false;
   }
-
   public boolean addItem(Measurable item) {
     int weight = item.getWeight();
     if (weight < 2) {
@@ -392,13 +409,15 @@ public class PackageService {
       return false;
     }
   }
-
   public boolean addItem(Packageable item) {
+    packageItem(item);
     return true;
   }
 
   private void packageItem(Measurable item) {
+  }
 
+  private void packageItem(Packageable item) {
   }
 }
 ```
@@ -418,6 +437,8 @@ public class Washer extends Measurable {
 
 .see-also[
 Les interfaces sont très largement utilisés dans le JDK : Serializable, Comparable, Runnable, ...
+
+Pensez aussi aux génériques (pas les médicaments, les [types Java Generic](https://docs.oracle.com/javase/tutorial/java/generics/types.html)).
 ]
 
 ---
