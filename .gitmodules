@@ -1,0 +1,6 @@
+[submodule "public"]
+	path = public
+	url = https://github.com/jppop/jppop.github.io.git
+[submodule "themes/hugo-icarus-theme"]
+	path = themes/hugo-icarus-theme
+	url = https://github.com/digitalcraftsman/hugo-icarus-theme.git
