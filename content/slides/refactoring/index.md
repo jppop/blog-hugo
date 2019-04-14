@@ -1,5 +1,5 @@
 ---
-title: "Quick Tips -- Refcatoring "
+title: "Quick Tips -- Refactoring"
 date: "2019-04-13T16:43:02-04:00"
 url: "/slides/refactoring/"
 ---
@@ -110,14 +110,15 @@ private boolean isHoliday(LocalDate when) {
 --
 .see-also[
 
-> .focus[Design Patterns].
->
-> <i>In software engineering, a .focus[design pattern] is a general repeatable solution to a commonly occurring problem in software design</i>
->
-> -- <cite>[Source Making](https://sourcemaking.com/design_patterns)</cite>
+#### .focus[Design Patterns].
 
-> De Martin Fowler, un [Catalog of Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
-> ]
+<img src="/images/quotation-open.png" width="16px" height="16px" style="transform: translate(0px, -8px);"/>
+In software engineering, a .focus[design pattern] is a general repeatable solution to a commonly occurring problem in software design.
+<img src="/images/quotation-close.png" width="16px" height="16px" style="transform: translate(0px, 8px);" />  
+<cite>[Source Making](https://sourcemaking.com/design_patterns)</cite>
+
+De Martin Fowler, un [Catalog of Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
+]
 
 ---
 
