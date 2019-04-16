@@ -327,6 +327,28 @@ est fortement réduit (le développeur a une vue d'ensemble de l'immeuble).
 
 template: none
 
+# Là, je répète
+
+Une exception au DRY : les contrôles de surface vs les contrôles dans la couche métier.
+
+Par exemple, une application WEB propose un formulaire en ligne.
+Des contrôles de surface sont effectués : un montant supérieur à 0, une adresse mail correctement
+formatée, etc.
+
+Est-ce qu'il faut également répéter ces contrôles dans la couche métier (l'API qu'appellera le frontend) ?
+
+Oui.
+
+La couche métier est une "frontière" du système, un point d'entrée. Les "consommateurs" de la couche métier ne sont pas toujours "clean". La douane doit les contrôler. Une fois à l'intérieur, on peut être plus souple.
+
+.see-also[
+Les contrôles aussi dans la couche données ? Le moins possible. La couche données n'est pas censée être exposée directement. On "tolère" souvent des contraintes d'intégrité dans le SGBD mais on pourrait (devrait) s'en passer.
+]
+
+---
+
+template: none
+
 # Abstraction
 
 Jeff Bolos se lance dans la vente en ligne de livres. Il automatise l'emballage.
