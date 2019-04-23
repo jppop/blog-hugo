@@ -16,3 +16,4 @@ tags = ["dev", "java"]
 
 - [NullPointerException](/slides/npe/) : la chasse aux références nulles
 - [Refactoring](/slides/refactoring/) ou comment ne pas abuser du copier/coller
+- [Spring Batch Tests](/slides/spring-batch-test/) ou comment automatiser les tests de jobs Spring Batch
