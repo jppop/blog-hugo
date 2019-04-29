@@ -553,3 +553,7 @@ Quelques règles :
   améliorer la journalisation.
 
 Bonus : on vous demandera surement un jour [un truc comme ça](https://moelholm.com/2016/08/16/spring-boot-enhance-your-logging/).
+
+.note[
+Crédits : [OpenDayLight, Logging Best Practices](https://wiki.opendaylight.org/view/BestPractices/Logging_Best_Practices)
+]
