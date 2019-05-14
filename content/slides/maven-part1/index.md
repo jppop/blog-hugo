@@ -1,5 +1,5 @@
 ---
-title: "Quick Tips -- Maven I"
+title: "Quick Tips -- Maven S01E01"
 date: "2019-05-03T11:30:00+02:00"
 url: "/slides/maven-part1/"
 ---
