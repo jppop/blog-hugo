@@ -28,6 +28,17 @@ Pour rappel, le _lifecyle build_ par défaut [associe des plugins aux différent
 
 Par exemple, pour un _packaging_ de type `jar`
 
+| **phase**              | **plugin goals**                                                  |
+| ---------------------- | ----------------------------------------------------------------- |
+| process-resources      | org.apache.maven.plugins:maven-resources-plugin:2.6:resources     |
+| compile                | org.apache.maven.plugins:maven-compiler-plugin:3.1:compile        |
+| process-test-resources | org.apache.maven.plugins:maven-resources-plugin:2.6:testResources |
+| test-compile           | org.apache.maven.plugins:maven-compiler-plugin:3.1:testCompile    |
+| test                   | org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test        |
+| package                | org.apache.maven.plugins:maven-jar-plugin:2.4:jar                 |
+| install                | org.apache.maven.plugins:maven-install-plugin:2.4:install         |
+| deploy                 | org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy           |
+
 ---
 
 # Configuration du plugin `compiler`
@@ -78,17 +89,6 @@ Comment se rappeler de toutes les options de tous les plugins ?
 Tous les plugins les plus communs sont documentés en ligne.
 
 Par exemple, le plugin [compiler](https://maven.apache.org/plugins/maven-compiler-plugin/index.html)
-
-| **phase**              | **plugin goals**                                                  |
-| ---------------------- | ----------------------------------------------------------------- |
-| process-resources      | org.apache.maven.plugins:maven-resources-plugin:2.6:resources     |
-| compile                | org.apache.maven.plugins:maven-compiler-plugin:3.1:compile        |
-| process-test-resources | org.apache.maven.plugins:maven-resources-plugin:2.6:testResources |
-| test-compile           | org.apache.maven.plugins:maven-compiler-plugin:3.1:testCompile    |
-| test                   | org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test        |
-| package                | org.apache.maven.plugins:maven-jar-plugin:2.4:jar                 |
-| install                | org.apache.maven.plugins:maven-install-plugin:2.4:install         |
-| deploy                 | org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy           |
 
 ---
 
@@ -208,7 +208,7 @@ Quelques règles pour contrôler quelles dépendances sont inclues :
 --
 
 - .focus[_Dependency management_]  
-  Permet de fixer les versions des dépendances trouvées dans le graphe des dépendances tranistives ou quand la version n'est pas spécifiée.
+  Permet de fixer les versions des dépendances trouvées dans le graphe des dépendances transitives ou quand la version n'est pas spécifiée.
 
 --
 
@@ -296,7 +296,7 @@ Pour trouver une version, consultez le [catalogue en ligne](https://search.maven
 
 Une _repository_ est un catalogue de dépendance.  
 Deux types de repo : _local_ et _remote_.
-Elles sont structurée de la même manière (groupId/articfactId/version)
+Elles sont structurées de la même manière (groupId/articfactId/version)
 
 ### Local repository.
 
