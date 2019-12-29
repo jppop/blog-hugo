@@ -2,6 +2,8 @@
 title: "Quick Tips -- Spring Batch Unit Testing"
 date: "2019-04-13T16:43:02-04:00"
 url: "/slides/spring-batch-test/"
+categories: ["tips"]
+tags: ["dev", "java"]
 ---
 
 class: center, middle

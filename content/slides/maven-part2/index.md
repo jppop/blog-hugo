@@ -2,6 +2,8 @@
 title: "Quick Tips -- Maven S01E02"
 date: "2019-05-03T11:30:00+02:00"
 url: "/slides/maven-part2/"
+categories: ["tips"]
+tags: ["dev", "java"]
 ---
 
 class: center, middle

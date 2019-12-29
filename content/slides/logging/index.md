@@ -2,6 +2,8 @@
 title: "Quick Tips -- Logging"
 date: "2019-04-28T11:30:00+02:00"
 url: "/slides/logging/"
+categories: ["tips"]
+tags: ["dev", "java"]
 ---
 
 class: center, middle

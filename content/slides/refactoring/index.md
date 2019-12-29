@@ -2,6 +2,8 @@
 title: "Quick Tips -- Refactoring"
 date: "2019-04-13T16:43:02-04:00"
 url: "/slides/refactoring/"
+categories: ["tips"]
+tags: ["dev", "java"]
 ---
 
 class: center, middle
